@@ -4,9 +4,11 @@ get file hashes
 
 #### Installation
 
+Run the following as root:
+
 ```bash
 cd /opt
-git clone git clone https://github.com/signebedi/fileHash.git
+git clone https://github.com/signebedi/fileHash.git
 cd fileHash
 python -m venv venv
 source venv/bin/activate
