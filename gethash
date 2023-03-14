@@ -1,0 +1,28 @@
+#!/opt/fileHash/venv/bin/python
+
+import click
+import hashlib
+import os
+
+@click.command()
+@click.argument('file_paths', type=str,)
+def gethash(file_paths):
+    """
+    Given a string argument of unique file paths, separated by \\n, get the md5 hash of each of these files and print them in the console.
+    """
+    paths = file_paths.replace('\r', '').replace('\\n', '\n').split('\n')
+    # print(paths)
+
+    for path in paths:
+        try:
+            with open(path, 'rb') as f:
+                file_hash = hashlib.md5()
+                while chunk := f.read(8192):
+                    file_hash.update(chunk)
+                click.echo(f'{path}: {file_hash.hexdigest()}')
+        # except FileNotFoundError:
+        except Exception as e:
+            click.echo(f'File not found: {path}. {e}')
+
+if __name__ == '__main__':
+    gethash()
