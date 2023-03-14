@@ -6,23 +6,33 @@ import os
 
 @click.command()
 @click.argument('file_paths', type=str,)
-def gethash(file_paths):
+@click.option('--algorithm', '-a', default='md5',
+              type=click.Choice(['md5', 'sha1'], case_sensitive=False),
+              help='Hash algorithm to use (md5 or sha1). Default is md5.')
+def gethash(file_paths, algorithm):
     """
     Given a string argument of unique file paths, separated by \\n, get the md5 hash of each of these files and print them in the console.
     """
+
+    if algorithm.lower() == 'md5':
+        hash_func = hashlib.md5
+    else:
+        hash_func = hashlib.sha1
+
     paths = file_paths.replace('\r', '').replace('\\n', '\n').split('\n')
     # print(paths)
 
     for path in paths:
         try:
             with open(path, 'rb') as f:
-                file_hash = hashlib.md5()
+                file_hash = hash_func()
                 while chunk := f.read(8192):
                     file_hash.update(chunk)
                 click.echo(f'{path}: {file_hash.hexdigest()}')
-        # except FileNotFoundError:
-        except Exception as e:
-            click.echo(f'File not found: {path}. {e}')
+        except FileNotFoundError:
+            click.echo(f'File not found: {path}')
+        except PermissionError:
+            click.echo(f"Permission denied: {path}")
 
 if __name__ == '__main__':
     gethash()
